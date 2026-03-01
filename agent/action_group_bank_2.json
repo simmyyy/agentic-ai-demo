@@ -1,0 +1,14 @@
+[
+  {
+    "name": "ResumeAppRunnerService",
+    "description": "Resumes (unpause) an App Runner service. Call ONLY after the user has explicitly accepted resuming. Requires user confirmation.",
+    "parameters": {
+      "service_name": {
+        "description": "Service name: account-service or payments-service",
+        "required": "True",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "ENABLED"
+  }
+]

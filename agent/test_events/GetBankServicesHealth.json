@@ -1,0 +1,9 @@
+{
+  "actionGroup": "action_group_bank_1",
+  "apiPath": "getBankServicesHealth",
+  "httpMethod": "POST",
+  "parameters": [],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

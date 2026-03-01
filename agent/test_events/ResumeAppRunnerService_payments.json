@@ -1,0 +1,14 @@
+{
+  "actionGroup": "action_group_bank_2",
+  "apiPath": "resumeAppRunnerService",
+  "httpMethod": "POST",
+  "parameters": [
+    {
+      "name": "service_name",
+      "value": "payments-service"
+    }
+  ],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "GetAlertSummary",
+    "description": "Fetches alert summary for the last 12h or 24h. Use when the user asks about alerts, alert summary, or alert statistics. Returns data in table format.",
+    "parameters": {
+      "hours": {
+        "description": "Time period in hours: 12 or 24 (default 24)",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetBankServicesHealth",
+    "description": "Checks health of bank services (account, payments). Use when the user asks about service status, health check, or whether services are running.",
+    "parameters": {},
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetAppRunnerServiceStatus",
+    "description": "Fetches App Runner service status (account-service, payments-service). Checks if service is RUNNING or PAUSED. If PAUSED – propose resuming and ask user for acceptance.",
+    "parameters": {},
+    "requireConfirmation": "DISABLED"
+  }
+]
