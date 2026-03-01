@@ -1,0 +1,52 @@
+[
+  {
+    "name": "SaveAlertState",
+    "description": "Saves current alert snapshot to AlertState after fetching alerts. Call after GetAlertSummary. Can include agent_actionable and agent_not_actionable (comma-separated alert types) to mark which are actionable.",
+    "parameters": {
+      "hours": {
+        "description": "Time period in hours: 1, 12, 24 (default 24)",
+        "required": "False",
+        "type": "String"
+      },
+      "minutes": {
+        "description": "Time period in minutes (e.g. 1 for last 1 minute). Overrides hours.",
+        "required": "False",
+        "type": "String"
+      },
+      "agent_actionable": {
+        "description": "Comma-separated alert types agent marks as actionable (e.g. timeout,error_rate)",
+        "required": "False",
+        "type": "String"
+      },
+      "agent_not_actionable": {
+        "description": "Comma-separated alert types agent marks as non-actionable",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetAlertState",
+    "description": "Gets current alert state (snapshot, context, recent actions). Use for actionable analysis and action history context.",
+    "parameters": {},
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetActionableAlerts",
+    "description": "Returns which alerts are actionable. DEFAULT: all alerts are actionable. Only non-actionable if user explicitly marked via MarkAlertActionable. Use same minutes/hours as GetAlertSummary.",
+    "parameters": {
+      "hours": {
+        "description": "Time period in hours: 1, 12, 24 (default 24)",
+        "required": "False",
+        "type": "String"
+      },
+      "minutes": {
+        "description": "Time period in minutes (e.g. 1 for last 1 minute). Overrides hours.",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  }
+]

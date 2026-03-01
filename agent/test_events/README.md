@@ -15,15 +15,21 @@ Use these JSON files to test the Lambda in the AWS Console.
 
 | File | Function | Notes |
 |------|----------|-------|
-| `GetAlertSummary.json` | GetAlertSummary | 24h window – requires `ACCOUNT_SERVICE_URL` |
+| `GetAlertSummary.json` | GetAlertSummary | 24h window |
 | `GetAlertSummary_12h.json` | GetAlertSummary | 12h window |
 | `GetBankServicesHealth.json` | GetBankServicesHealth | Requires both service URLs |
-| `GetAppRunnerServiceStatus.json` | GetAppRunnerServiceStatus | Needs `apprunner:ListServices`, `apprunner:DescribeService` |
-| `ResumeAppRunnerService.json` | ResumeAppRunnerService | Resumes account-service – **actually resumes!** |
+| `GetAppRunnerServiceStatus.json` | GetAppRunnerServiceStatus | App Runner permissions |
+| `ResumeAppRunnerService.json` | ResumeAppRunnerService | **Actually resumes!** |
 | `ResumeAppRunnerService_payments.json` | ResumeAppRunnerService | Resumes payments-service |
+| `SaveAlertState.json` | SaveAlertState | Requires AlertState table |
+| `GetActionableAlerts.json` | GetActionableAlerts | Requires AlertState |
+| `SaveAction.json` | SaveAction | Requires AlertState |
+| `SaveIncident.json` | SaveIncident | Requires Incidents table |
+| `MarkAlertActionable.json` | MarkAlertActionable | Mark timeout as actionable |
+| `MarkAlertNonActionable.json` | MarkAlertActionable | Mark timeout as non-actionable |
 
 ## Prerequisites
 
-- **GetAlertSummary**: Lambda role needs DynamoDB permissions (Query on AlertAggregates). No service URL needed – reads directly from DynamoDB.
-- **GetBankServicesHealth**: Set `ACCOUNT_SERVICE_URL` and `PAYMENTS_SERVICE_URL` in Lambda env vars
-- **GetAppRunnerServiceStatus**, **ResumeAppRunnerService**: Lambda role needs App Runner permissions (see `LAMBDA_SETUP.md`)
+- **Tables**: Run `./scripts/setup-tables.sh` to create AlertState and Incidents
+- **Lambda env**: `ALERT_STATE_TABLE`, `INCIDENTS_TABLE` (optional, default names)
+- **Permissions**: See `LAMBDA_SETUP.md`

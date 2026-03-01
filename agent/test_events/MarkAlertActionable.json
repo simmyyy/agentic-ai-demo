@@ -1,0 +1,12 @@
+{
+  "actionGroup": "action_group_bank_6",
+  "apiPath": "markAlertActionable",
+  "httpMethod": "POST",
+  "parameters": [
+    {"name": "alert_type", "value": "timeout"},
+    {"name": "status", "value": "actionable"}
+  ],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

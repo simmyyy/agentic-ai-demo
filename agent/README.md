@@ -13,7 +13,7 @@ agent/
 │   └── resume_apprunner_service.py
 ├── lambda_handler.py
 ├── build_full.zip.sh         # Build zip (Mac → Linux)
-├── action_group_bank_1.json  # GetAlertSummary, GetBankServicesHealth, GetAppRunnerServiceStatus
+├── action_group_bank_1.json  # GetAlertSummary, GetBankServicesStatus
 ├── action_group_bank_2.json  # ResumeAppRunnerService (requireConfirmation: ENABLED)
 ├── agent_instructions.md    # Bedrock Agent instructions
 └── requirements.txt
@@ -48,7 +48,7 @@ Find agent ID: Bedrock → Agents → your agent.
 **Environment variables:**
 - `ALERT_TABLE_NAME` – DynamoDB table (default: `AlertAggregates`)
 - `AWS_REGION` – us-east-2 (default)
-- `ACCOUNT_SERVICE_URL`, `PAYMENTS_SERVICE_URL` – for GetBankServicesHealth only (GetAlertSummary reads DynamoDB directly)
+- `ACCOUNT_SERVICE_URL`, `PAYMENTS_SERVICE_URL` – for GetBankServicesStatus (health check)
 
 **Lambda IAM role** – permissions:
 - `dynamodb:Query`, `dynamodb:GetItem` on `AlertAggregates` (GetAlertSummary)
@@ -59,13 +59,9 @@ Find agent ID: Bedrock → Agents → your agent.
 
 1. **Create Agent** in AWS Bedrock (Agents → Create agent).
 
-2. **Action Group 1** – `action_group_bank_1.json`:
-   - Lambda ARN: your function
-   - Function definitions: import or enter manually from JSON (3 functions).
-
-3. **Action Group 2** – `action_group_bank_2.json`:
-   - Same Lambda
-   - Function definitions: ResumeAppRunnerService with `requireConfirmation: ENABLED`.
+2. **Action Groups 1–6** – `action_group_bank_1.json` through `action_group_bank_6.json`:
+   - Same Lambda for all
+   - Import each JSON (max 3 functions per group).
 
 4. **Instructions** – copy the contents of `agent_instructions.md` into the agent's "Instructions" field.
 
@@ -73,5 +69,9 @@ Find agent ID: Bedrock → Agents → your agent.
 
 | Group | Functions |
 |-------|-----------|
-| action_group_bank_1 | GetAlertSummary, GetBankServicesHealth, GetAppRunnerServiceStatus |
+| action_group_bank_1 | GetAlertSummary, GetBankServicesStatus |
 | action_group_bank_2 | ResumeAppRunnerService (requires confirmation) |
+| action_group_bank_3 | SaveAlertState, GetAlertState, GetActionableAlerts |
+| action_group_bank_4 | SaveAction, GetActions, GetIncidents |
+| action_group_bank_5 | SaveIncident |
+| action_group_bank_6 | MarkAlertActionable |

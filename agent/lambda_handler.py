@@ -11,7 +11,16 @@ from typing import Any
 from tools.get_alert_summary import handler as get_alert_summary
 from tools.get_bank_services_health import handler as get_bank_services_health
 from tools.get_apprunner_service_status import handler as get_apprunner_service_status
+from tools.get_bank_services_status import handler as get_bank_services_status
 from tools.resume_apprunner_service import handler as resume_apprunner_service
+from tools.save_alert_state import handler as save_alert_state
+from tools.get_alert_state import handler as get_alert_state
+from tools.get_actionable_alerts import handler as get_actionable_alerts
+from tools.save_action import handler as save_action
+from tools.get_actions import handler as get_actions
+from tools.save_incident import handler as save_incident
+from tools.get_incidents import handler as get_incidents
+from tools.mark_alert_actionable import handler as mark_alert_actionable
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,9 +37,36 @@ TOOL_HANDLERS = {
     "GetAppRunnerServiceStatus": get_apprunner_service_status,
     "getAppRunnerServiceStatus": get_apprunner_service_status,
     "/getAppRunnerServiceStatus": get_apprunner_service_status,
+    "GetBankServicesStatus": get_bank_services_status,
+    "getBankServicesStatus": get_bank_services_status,
+    "/getBankServicesStatus": get_bank_services_status,
     "ResumeAppRunnerService": resume_apprunner_service,
     "resumeAppRunnerService": resume_apprunner_service,
     "/resumeAppRunnerService": resume_apprunner_service,
+    "SaveAlertState": save_alert_state,
+    "saveAlertState": save_alert_state,
+    "/saveAlertState": save_alert_state,
+    "GetAlertState": get_alert_state,
+    "getAlertState": get_alert_state,
+    "/getAlertState": get_alert_state,
+    "GetActionableAlerts": get_actionable_alerts,
+    "getActionableAlerts": get_actionable_alerts,
+    "/getActionableAlerts": get_actionable_alerts,
+    "SaveAction": save_action,
+    "saveAction": save_action,
+    "/saveAction": save_action,
+    "GetActions": get_actions,
+    "getActions": get_actions,
+    "/getActions": get_actions,
+    "SaveIncident": save_incident,
+    "saveIncident": save_incident,
+    "/saveIncident": save_incident,
+    "GetIncidents": get_incidents,
+    "getIncidents": get_incidents,
+    "/getIncidents": get_incidents,
+    "MarkAlertActionable": mark_alert_actionable,
+    "markAlertActionable": mark_alert_actionable,
+    "/markAlertActionable": mark_alert_actionable,
 }
 
 

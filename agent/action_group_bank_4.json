@@ -1,0 +1,58 @@
+[
+  {
+    "name": "SaveAction",
+    "description": "Saves an action to history when user approves and executes (e.g. resume service). Call after ResumeAppRunnerService succeeds to log the action.",
+    "parameters": {
+      "service": {
+        "description": "Service name: account-service or payments-service",
+        "required": "True",
+        "type": "String"
+      },
+      "action_type": {
+        "description": "Type of action: resume, etc.",
+        "required": "False",
+        "type": "String"
+      },
+      "rationale": {
+        "description": "Why the action was taken (e.g. User approved resume of paused service)",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetActions",
+    "description": "Gets action history. Use when user asks about past actions \u2013 provide context 'I have already performed similar actions' with details.",
+    "parameters": {
+      "limit": {
+        "description": "Max actions to return (default 10)",
+        "required": "False",
+        "type": "String"
+      },
+      "service": {
+        "description": "Filter by service (optional)",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  },
+  {
+    "name": "GetIncidents",
+    "description": "Gets incidents from the incident log. Use fetch_all=true when user asks for ALL incidents. Otherwise use limit (default 10).",
+    "parameters": {
+      "limit": {
+        "description": "Max incidents to return (default 10). Ignored if fetch_all=true.",
+        "required": "False",
+        "type": "String"
+      },
+      "fetch_all": {
+        "description": "Set to true or 'all' to fetch ALL incidents. Use when user says 'all incidents', 'show everything', 'full history'.",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  }
+]

@@ -17,10 +17,23 @@ REGION = os.environ.get("AWS_REGION", "us-east-2")
 
 def handler(params: list[dict], body: dict | None) -> dict[str, Any]:
     p = _params_to_dict(params, body)
-    hours = p.get("hours") or p.get("Hours") or "24"
-    hours = int(hours) if str(hours).isdigit() else 24
-    if hours not in (12, 24):
-        hours = 24
+    minutes = p.get("minutes") or p.get("Minutes")
+    if minutes is not None:
+        try:
+            minutes = int(minutes) if isinstance(minutes, str) and minutes.isdigit() else int(float(minutes))
+            hours = max(1 / 60, minutes / 60)
+        except (ValueError, TypeError):
+            hours = 24
+    else:
+        hours_val = p.get("hours") or p.get("Hours") or "24"
+        try:
+            hours = float(hours_val) if "." in str(hours_val) else int(hours_val)
+        except (ValueError, TypeError):
+            hours = 24
+        if hours <= 0:
+            hours = 24
+        if hours < 1 / 60:
+            hours = 1 / 60
 
     try:
         data = _query_dynamo(hours)
@@ -43,7 +56,7 @@ def handler(params: list[dict], body: dict | None) -> dict[str, Any]:
     return {"summary": summary, "raw": data}
 
 
-def _query_dynamo(hours: int) -> dict:
+def _query_dynamo(hours: float) -> dict:
     """Query DynamoDB AlertAggregates table directly."""
     dynamodb = boto3.resource("dynamodb", region_name=REGION)
     table = dynamodb.Table(TABLE_NAME)
@@ -94,13 +107,17 @@ def _query_dynamo(hours: int) -> dict:
     }
 
 
-def _build_table_summary(total: int, by_service: dict, by_type: dict, by_host: dict, hours: int) -> str:
+def _build_table_summary(total: int, by_service: dict, by_type: dict, by_host: dict, hours: float) -> str:
     """Build markdown-style table for agent to display."""
+    if hours < 1:
+        period = f"Last {int(hours * 60)}min"
+    else:
+        period = f"Last {hours}h" if hours == int(hours) else f"Last {hours}h"
     lines = [
         "| Metric | Value |",
         "|--------|-------|",
         f"| **Total alerts** | {total} |",
-        f"| **Period** | Last {hours}h |",
+        f"| **Period** | {period} |",
         "",
         "**By service:**",
     ]

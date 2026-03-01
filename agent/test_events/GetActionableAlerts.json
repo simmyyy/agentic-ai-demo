@@ -1,0 +1,9 @@
+{
+  "actionGroup": "action_group_bank_3",
+  "apiPath": "getActionableAlerts",
+  "httpMethod": "POST",
+  "parameters": [{"name": "hours", "value": "24"}],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

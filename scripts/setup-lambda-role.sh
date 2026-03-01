@@ -10,11 +10,13 @@ ROLE_NAME="${1:?Usage: $0 <LAMBDA_ROLE_NAME>}"
 POLICY_NAME="BankAgentLambdaPolicy"
 REGION="${AWS_REGION:-us-east-2}"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-TABLE_ARN="arn:aws:dynamodb:${REGION}:${ACCOUNT_ID}:table/AlertAggregates"
+ALERT_ARN="arn:aws:dynamodb:${REGION}:${ACCOUNT_ID}:table/AlertAggregates"
+STATE_ARN="arn:aws:dynamodb:${REGION}:${ACCOUNT_ID}:table/AlertState"
+INCIDENTS_ARN="arn:aws:dynamodb:${REGION}:${ACCOUNT_ID}:table/Incidents"
 
 echo "=== Attaching DynamoDB + App Runner policy to Lambda role ==="
 echo "Role: $ROLE_NAME"
-echo "Table: AlertAggregates ($REGION)"
+echo "Tables: AlertAggregates, AlertState, Incidents ($REGION)"
 echo ""
 
 POLICY=$(cat <<EOF
@@ -27,12 +29,17 @@ POLICY=$(cat <<EOF
       "Action": [
         "dynamodb:Query",
         "dynamodb:GetItem",
+        "dynamodb:PutItem",
         "dynamodb:BatchGetItem",
         "dynamodb:DescribeTable"
       ],
       "Resource": [
-        "${TABLE_ARN}",
-        "${TABLE_ARN}/index/*"
+        "${ALERT_ARN}",
+        "${ALERT_ARN}/index/*",
+        "${STATE_ARN}",
+        "${STATE_ARN}/index/*",
+        "${INCIDENTS_ARN}",
+        "${INCIDENTS_ARN}/index/*"
       ]
     },
     {
@@ -58,8 +65,7 @@ aws iam put-role-policy \
 echo "Policy '$POLICY_NAME' attached to role '$ROLE_NAME'"
 echo ""
 echo "Lambda can now:"
-echo "  - Query DynamoDB AlertAggregates (GetAlertSummary)"
-echo "  - List App Runner services"
+echo "  - Query/Put AlertAggregates, AlertState, Incidents"
 echo "  - Describe service status (RUNNING/PAUSED)"
 echo "  - Resume paused services"
 echo ""

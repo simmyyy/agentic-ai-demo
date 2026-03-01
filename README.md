@@ -9,48 +9,42 @@ Bank monitoring demo: **App Runner** services + **DynamoDB** + **Bedrock Agent**
 | **Services** | `account-service`, `payments-service` – FastAPI on App Runner, write alerts to DynamoDB |
 | **DynamoDB** | `AlertAggregates` – stores alerts (pk, sk, service, warning_type, host, timestamp) |
 | **Agent** | AWS Bedrock Agent – conversational assistant for monitoring |
-| **Tools** | Lambda: GetAlertSummary, GetBankServicesHealth, GetAppRunnerServiceStatus, ResumeAppRunnerService |
+| **Tools** | Lambda: GetAlertSummary, GetBankServicesStatus, SaveAlertState, GetActionableAlerts, MarkAlertActionable, ResumeAppRunnerService, SaveAction, GetActions, GetIncidents |
 
 ## Agent Workflow
 
-1. **Get alert summary** – User asks for alerts → agent calls GetAlertSummary (reads DynamoDB directly) → returns table (total, by service, by type).
-2. **Check bank services** – User asks about service status → agent calls GetBankServicesHealth + GetAppRunnerServiceStatus → returns health and RUNNING/PAUSED status.
-3. **Investigate why services are down** – Agent uses summary + status to reason: if PAUSED → propose resume; if health fails → report which service is unreachable.
-4. **Resume service** – User confirms → agent calls ResumeAppRunnerService (requires confirmation).
+1. **Get alert summary** – GetAlertSummary → SaveAlertState (tracks first_seen, last_seen).
+2. **Which alerts are actionable** – GetActionableAlerts (per-type status). User can "mark as actionable" / "mark as non-actionable" → MarkAlertActionable.
+3. **Check bank services** – GetBankServicesStatus (Health API + App Runner merged). Before resume, GetActions for past context.
+4. **Resume service** – User confirms → ResumeAppRunnerService → SaveAction (logs action).
+5. **Past actions/incidents** – GetActions, GetIncidents (read-only).
 
-## Example Prompts
+## Demo Prompts
 
-```
-Give me a summary of alerts from the last 24 hours.
-```
+Use these prompts during the demo:
 
-```
-Check the status of our bank services.
-```
-
-```
-Why are the bank services down? Can you investigate?
-```
-
-```
-Show me alert statistics and then check if account and payments are healthy.
-```
+1. **Show me alerts summary for last 24 hours**
+2. **Are there any actionable alerts?**
+3. **How are the banking services today?**
+4. **Check again banking services**
+5. **Yes, please, resume the service**
 
 ## Setup (summary)
 
 - **ECR**: `agentic-demo/account-service`, `agentic-demo/payments-service`
-- **DynamoDB**: Table `AlertAggregates` (pk, sk) in `us-east-2`
+- **DynamoDB**: `AlertAggregates`, `AlertState`, `Incidents` (pk, sk) in `us-east-2`
 - **App Runner**: Both services, port 8000, Instance role with DynamoDB access
 - **Lambda**: Deploy `agent/lambda_full_x86.zip`, set env vars, add DynamoDB + App Runner permissions
-- **Bedrock**: Create agent, add action groups from `agent/action_group_bank_*.json`, paste `agent/agent_instructions.md`
+- **Bedrock**: Create agent, add action groups from `agent/action_group_bank_1.json` through `action_group_bank_6.json`, paste `agent/agent_instructions.md`
 
 ```bash
 ./scripts/setup-instance-role.sh          # App Runner Instance role
+./scripts/setup-tables.sh                 # AlertState, Incidents tables
 ./scripts/setup-lambda-role.sh <role>     # Lambda permissions
 ./scripts/push-ecr.sh                     # Build & deploy services
 ```
 
-See `agent/README.md` and `agent/LAMBDA_SETUP.md` for details.
+See `agent/README.md`, `agent/LAMBDA_SETUP.md`, `agent/DYNAMODB_SCHEMA.md` for details.
 
 ## Alert API
 

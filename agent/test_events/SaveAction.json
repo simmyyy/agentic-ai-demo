@@ -1,0 +1,13 @@
+{
+  "actionGroup": "action_group_bank_4",
+  "apiPath": "saveAction",
+  "httpMethod": "POST",
+  "parameters": [
+    {"name": "service", "value": "account-service"},
+    {"name": "action_type", "value": "resume"},
+    {"name": "rationale", "value": "User approved resume of paused service"}
+  ],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

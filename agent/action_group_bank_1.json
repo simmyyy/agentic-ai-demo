@@ -1,10 +1,15 @@
 [
   {
     "name": "GetAlertSummary",
-    "description": "Fetches alert summary for the last 12h or 24h. Use when the user asks about alerts, alert summary, or alert statistics. Returns data in table format.",
+    "description": "Fetches alert summary. Use minutes=1 for 'last 1 minute', minutes=5 for 'last 5 minutes'. Use hours=1, 12, 24 otherwise. Returns data in table format.",
     "parameters": {
       "hours": {
-        "description": "Time period in hours: 12 or 24 (default 24)",
+        "description": "Time period in hours: 1, 12, 24 (default 24)",
+        "required": "False",
+        "type": "String"
+      },
+      "minutes": {
+        "description": "Time period in minutes (e.g. 1, 5, 30). Use when user asks for last 1 minute, 5 minutes, etc. Overrides hours.",
         "required": "False",
         "type": "String"
       }
@@ -12,14 +17,8 @@
     "requireConfirmation": "DISABLED"
   },
   {
-    "name": "GetBankServicesHealth",
-    "description": "Checks health of bank services (account, payments). Use when the user asks about service status, health check, or whether services are running.",
-    "parameters": {},
-    "requireConfirmation": "DISABLED"
-  },
-  {
-    "name": "GetAppRunnerServiceStatus",
-    "description": "Fetches App Runner service status (account-service, payments-service). Checks if service is RUNNING or PAUSED. If PAUSED – propose resuming and ask user for acceptance.",
+    "name": "GetBankServicesStatus",
+    "description": "Returns combined bank services status: Health API (/health) + App Runner (RUNNING/PAUSED). One table per service \u2013 use when user asks about service status, health, or whether services are running. Display the table_summary exactly as returned.",
     "parameters": {},
     "requireConfirmation": "DISABLED"
   }

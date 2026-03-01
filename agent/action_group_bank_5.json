@@ -1,0 +1,34 @@
+[
+  {
+    "name": "SaveIncident",
+    "description": "Saves an incident to the Incidents table. Call ONLY after user agrees to 'save this event to the incident log'. Ask first, then call if user confirms.",
+    "parameters": {
+      "summary": {
+        "description": "Short summary of the incident",
+        "required": "True",
+        "type": "String"
+      },
+      "service": {
+        "description": "Affected service: account-service, payments-service, or unknown",
+        "required": "False",
+        "type": "String"
+      },
+      "severity": {
+        "description": "Severity: low, medium, high, critical",
+        "required": "False",
+        "type": "String"
+      },
+      "actions_taken": {
+        "description": "Description of actions taken (or list)",
+        "required": "False",
+        "type": "String"
+      },
+      "root_cause": {
+        "description": "Root cause hypothesis if known",
+        "required": "False",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  }
+]

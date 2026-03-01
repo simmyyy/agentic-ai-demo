@@ -16,43 +16,69 @@ def handler(params: list[dict], body: dict | None) -> dict[str, Any]:
 
     results = []
     services = [
-        ("account", account_url, "/health"),
-        ("payments", payments_url, "/health"),
+        ("account-service", account_url, "/health"),
+        ("payments-service", payments_url, "/health"),
     ]
 
     for name, base_url, path in services:
+        full_url = f"{base_url}{path}" if base_url else ""
         if not base_url:
-            results.append({"service": name, "status": "unknown", "error": "URL not configured"})
+            results.append({
+                "service": name,
+                "status": "unknown",
+                "status_display": "NOT CONFIGURED",
+                "error": "URL not configured",
+                "url_host": "-",
+            })
             continue
         try:
-            r = requests.get(f"{base_url}{path}", timeout=5)
+            r = requests.get(full_url, timeout=5)
             data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
             status = "ok" if r.status_code == 200 else "error"
             results.append({
                 "service": name,
                 "status": status,
+                "status_display": "OK" if status == "ok" else "SERVICE DOWN",
                 "http_status": r.status_code,
                 "response": data,
+                "url_host": _host_from_url(full_url),
             })
         except requests.RequestException as e:
-            results.append({"service": name, "status": "error", "error": str(e)})
+            results.append({
+                "service": name,
+                "status": "error",
+                "status_display": "SERVICE DOWN",
+                "error": str(e),
+                "url_host": _host_from_url(full_url),
+            })
 
     table = _build_health_table(results)
     return {"services": results, "table_summary": table}
 
 
+def _host_from_url(url: str) -> str:
+    """Extract host from URL for debugging (e.g. https://abc.awsapprunner.com/health -> abc.awsapprunner.com)."""
+    try:
+        from urllib.parse import urlparse
+        return urlparse(url).netloc or "-"
+    except Exception:
+        return "-"
+
+
 def _build_health_table(results: list[dict]) -> str:
     lines = [
-        "| Service | Status | Details |",
-        "|---------|--------|---------|",
+        "| Service | Health API | URL Host | Details |",
+        "|---------|------------|----------|---------|",
     ]
     for r in results:
         status = r.get("status", "unknown")
-        emoji = "✅" if status == "ok" else "❌"
+        display = r.get("status_display", "OK" if status == "ok" else "SERVICE DOWN")
+        emoji = "✅" if status == "ok" else "🔴"
+        url_host = r.get("url_host", "-")
         detail = r.get("error") or str(r.get("response", ""))
-        if len(detail) > 40:
-            detail = detail[:37] + "..."
-        lines.append(f"| {r.get('service', '?')} | {emoji} {status} | {detail} |")
+        if len(detail) > 35:
+            detail = detail[:32] + "..."
+        lines.append(f"| {r.get('service', '?')} | {emoji} {display} | {url_host} | {detail} |")
     return "\n".join(lines)
 
 

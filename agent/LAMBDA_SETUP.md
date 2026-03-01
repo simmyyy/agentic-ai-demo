@@ -4,9 +4,11 @@
 
 The Lambda needs:
 
-- **DynamoDB** – `GetAlertSummary` queries `AlertAggregates` directly (works when services are down)
+- **DynamoDB** – `AlertAggregates` (alerts), `AlertState` (snapshot, actions, context), `Incidents` (incident log)
 - **App Runner API** – for `GetAppRunnerServiceStatus` and `ResumeAppRunnerService`
 - **Outbound HTTP** – for `GetBankServicesHealth` (calls App Runner URLs)
+
+Create tables first: `./scripts/setup-tables.sh`
 
 ### Where to add permissions
 
@@ -28,12 +30,14 @@ The Lambda needs:
       "Action": [
         "dynamodb:Query",
         "dynamodb:GetItem",
+        "dynamodb:PutItem",
         "dynamodb:BatchGetItem",
         "dynamodb:DescribeTable"
       ],
       "Resource": [
         "arn:aws:dynamodb:us-east-2:YOUR_ACCOUNT_ID:table/AlertAggregates",
-        "arn:aws:dynamodb:us-east-2:YOUR_ACCOUNT_ID:table/AlertAggregates/index/*"
+        "arn:aws:dynamodb:us-east-2:YOUR_ACCOUNT_ID:table/AlertState",
+        "arn:aws:dynamodb:us-east-2:YOUR_ACCOUNT_ID:table/Incidents"
       ]
     },
     {
@@ -94,8 +98,10 @@ In Lambda → **Configuration** → **Environment variables**:
 | Key | Value | Required |
 |-----|-------|----------|
 | `ALERT_TABLE_NAME` | `AlertAggregates` | No (default) |
+| `ALERT_STATE_TABLE` | `AlertState` | No (default) |
+| `INCIDENTS_TABLE` | `Incidents` | No (default) |
 | `AWS_REGION` | `us-east-2` | No (default) |
 | `ACCOUNT_SERVICE_URL` | `https://xxx.us-east-2.awsapprunner.com` | Yes (for GetBankServicesHealth) |
 | `PAYMENTS_SERVICE_URL` | `https://yyy.us-east-2.awsapprunner.com` | Yes (for GetBankServicesHealth) |
 
-**GetAlertSummary** does not need service URLs – it reads from DynamoDB directly.
+**Important:** `ACCOUNT_SERVICE_URL` and `PAYMENTS_SERVICE_URL` must point to **different** App Runner URLs. If both point to the same service, when one is paused both will show as DOWN. Check the "URL Host" column in the health table – if both show the same hostname, fix the env vars.

@@ -1,0 +1,14 @@
+{
+  "actionGroup": "action_group_bank_5",
+  "apiPath": "saveIncident",
+  "httpMethod": "POST",
+  "parameters": [
+    {"name": "summary", "value": "account-service was paused, resumed after user approval"},
+    {"name": "service", "value": "account-service"},
+    {"name": "severity", "value": "medium"},
+    {"name": "actions_taken", "value": "Resumed account-service"}
+  ],
+  "requestBody": null,
+  "sessionAttributes": {},
+  "promptSessionAttributes": {}
+}

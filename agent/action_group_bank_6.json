@@ -1,0 +1,19 @@
+[
+  {
+    "name": "MarkAlertActionable",
+    "description": "Marks an alert type as actionable or non-actionable. Call when user says 'mark this alert as actionable' or 'mark this alert as non-actionable'.",
+    "parameters": {
+      "alert_type": {
+        "description": "Alert type: timeout, error_rate, latency_high, connection_refused, oom, cpu_high",
+        "required": "True",
+        "type": "String"
+      },
+      "status": {
+        "description": "actionable or non-actionable",
+        "required": "True",
+        "type": "String"
+      }
+    },
+    "requireConfirmation": "DISABLED"
+  }
+]
