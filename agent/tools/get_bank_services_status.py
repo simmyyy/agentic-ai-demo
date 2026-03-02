@@ -1,39 +1,56 @@
 """
 Combined bank services status: Health API (/health) + App Runner status.
-Returns ONE merged table – no agent interpretation needed. Each service row is independent.
+Uses App Runner service_url for health checks – no env var mix-up. Each service row is independent.
 """
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
-from tools.get_bank_services_health import handler as get_health
+import requests
+
 from tools.get_apprunner_service_status import handler as get_apprunner
 
 
 def handler(params: list[dict], body: dict | None) -> dict[str, Any]:
-    health_result = get_health(params, body)
+    # 1. Get App Runner status – includes service_url per service (source of truth)
     apprunner_result = get_apprunner(params, body)
-
-    health_by_svc = {r["service"]: r for r in health_result.get("services", [])}
     apprunner_by_svc = {r["service"]: r for r in apprunner_result.get("services", [])}
 
+    # 2. Health check using App Runner URLs (not env vars – avoids swap/mix-up)
     services = ["account-service", "payments-service"]
     rows = []
     for svc in services:
-        h = health_by_svc.get(svc, {})
         ar = apprunner_by_svc.get(svc, {})
-
-        health_status = h.get("status_display", "-")
-        health_emoji = "✅" if h.get("status") == "ok" else "🔴"
         apprunner_status = ar.get("status", "-")
         apprunner_emoji = "🟢" if apprunner_status == "RUNNING" else "⏸️" if apprunner_status == "PAUSED" else "❓"
-        url_host = h.get("url_host", "-")
 
-        notes = ""
-        if apprunner_status == "PAUSED":
-            notes = "Service paused – can resume"
-        elif h.get("status") != "ok" and h.get("error"):
-            notes = str(h.get("error", ""))[:40]
+        raw_url = (ar.get("service_url") or "").strip().rstrip("/")
+        if raw_url and not raw_url.startswith("http"):
+            raw_url = f"https://{raw_url}"
+        base_url = raw_url
+        url_host = urlparse(base_url).netloc if base_url else "-"
+
+        # Health check – use URL from App Runner (correct per service)
+        if not base_url:
+            health_emoji = "🔴"
+            health_status = "NO URL"
+            notes = "App Runner URL not found"
+        else:
+            try:
+                r = requests.get(f"{base_url}/health", timeout=5)
+                ok = r.status_code == 200
+                health_emoji = "✅" if ok else "🔴"
+                health_status = "OK" if ok else "SERVICE DOWN"
+                notes = ""
+                if apprunner_status == "PAUSED":
+                    notes = "Service paused – can resume"
+                elif not ok:
+                    notes = f"HTTP {r.status_code}"[:30]
+            except requests.RequestException as e:
+                health_emoji = "🔴"
+                health_status = "SERVICE DOWN"
+                notes = str(e)[:40]
 
         rows.append({
             "service": svc,

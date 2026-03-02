@@ -104,4 +104,4 @@ In Lambda → **Configuration** → **Environment variables**:
 | `ACCOUNT_SERVICE_URL` | `https://xxx.us-east-2.awsapprunner.com` | Yes (for GetBankServicesHealth) |
 | `PAYMENTS_SERVICE_URL` | `https://yyy.us-east-2.awsapprunner.com` | Yes (for GetBankServicesHealth) |
 
-**Important:** `ACCOUNT_SERVICE_URL` and `PAYMENTS_SERVICE_URL` must point to **different** App Runner URLs. If both point to the same service, when one is paused both will show as DOWN. Check the "URL Host" column in the health table – if both show the same hostname, fix the env vars.
+**Note:** `GetBankServicesStatus` uses App Runner API `service_url` for health checks (not env vars), so no URL mix-up. `GetBankServicesHealth` (legacy) still uses env vars.
